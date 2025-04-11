@@ -9,7 +9,9 @@ public enum UserRole {
 
     ACADEMIC_STAFF("Academic Staff", "Lecturers"),
 
-    NON_ACADEMIC_STAFF("Non-Academic Staff", "Technicians");
+    NON_ACADEMIC_STAFF("Non-Academic Staff", "Technicians"),
+
+    SPK_MANAGER("SPK Manager", "SPK Manager");
 
     private String code;
 

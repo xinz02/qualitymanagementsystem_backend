@@ -2,7 +2,7 @@ package com.qualitymanagementsystemfc.qualitymanagementsystem.web;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.enums.UserRole;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.LoginRequest;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.LoginRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.utils.CommonApiResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +22,8 @@ public class TestController {
         user.setRole(UserRole.STUDENT.getCode());
         user.setPassword("123");
 
-//        result.setData(user);
-        result.setStatus(401);
+        result.setData(user);
+//        result.setStatus(401);
         result.setMessage("Login unsuccessfully");
 
 

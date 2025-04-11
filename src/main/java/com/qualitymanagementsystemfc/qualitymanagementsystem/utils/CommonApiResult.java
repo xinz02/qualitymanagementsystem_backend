@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommonApiResult<T> {
-    private int status;
+//    private int status;
     private String message;
     private T data;
 

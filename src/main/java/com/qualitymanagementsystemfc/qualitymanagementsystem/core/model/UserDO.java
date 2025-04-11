@@ -15,13 +15,15 @@ import java.util.Date;
 public class UserDO {
 
     @Id
-    private String userID;
+    private String userId;
 
     private String name;
 
     private String username;
 
     private String password;
+
+    private String email;
 
     private String role;
 

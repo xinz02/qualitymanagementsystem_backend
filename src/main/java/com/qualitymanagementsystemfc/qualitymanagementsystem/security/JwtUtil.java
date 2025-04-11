@@ -1,74 +1,6 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.security;
-//
-//import io.jsonwebtoken.Claims;
-//import io.jsonwebtoken.Jwts;
-//import io.jsonwebtoken.SignatureAlgorithm;
-//import io.jsonwebtoken.security.Keys;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.stereotype.Component;
-//
-//import java.nio.charset.StandardCharsets;
-//import java.security.Key;
-//import java.util.Date;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.function.Function;
-//
-//@Component
-//public class JwtUtil {
-//
-//    private static final String SECRET_KEY = "yourSuperSecretKeyThatIsAtLeast32CharactersLong!!"; // Must be at least 32 characters
-//
-//    private Key getSigningKey() {
-//        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-//    }
-//
-//    public String extractUsername(String token) {
-//        return extractClaim(token, Claims::getSubject);
-//    }
-//
-//    public Date extractExpiration(String token) {
-//        return extractClaim(token, Claims::getExpiration);
-//    }
-//
-//    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-//        final Claims claims = extractAllClaims(token);
-//        return claimsResolver.apply(claims);
-//    }
-//
-//    private Claims extractAllClaims(String token) {
-//        return Jwts.parserBuilder()
-//                .setSigningKey(getSigningKey())
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody();
-//    }
-//
-//    public boolean validateToken(String token, UserDetails userDetails) {
-//        final String username = extractUsername(token);
-//        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-//    }
-//
-//    private boolean isTokenExpired(String token) {
-//        return extractExpiration(token).before(new Date());
-//    }
-//
-//    public String generateToken(UserDetails userDetails) {
-//        Map<String, Object> claims = new HashMap<>();
-//        return createToken(claims, userDetails.getUsername());
-//    }
-//
-//    private String createToken(Map<String, Object> claims, String subject) {
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setSubject(subject)
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-//                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Correct signing method
-//                .compact();
-//    }
-//}
 
+import com.qualitymanagementsystemfc.qualitymanagementsystem.service.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -76,12 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -93,13 +28,35 @@ public class JwtUtil {
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
-    public String generateJwtToken(Authentication authentication) {
+//    public String generateJwtToken(Authentication authentication) {
+//
+//        UserDetails userDetails =
+//                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//        return Jwts.builder()
+//                .setSubject((userDetails.getUsername()))
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+//                .signWith(key(), SignatureAlgorithm.HS256)
+//                .compact();
+//    }
 
-        UserDetails userDetails =
-                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public String generateJwtToken(Authentication authentication) {
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+//        UserDetails userDetails =
+//                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Get roles (assuming your UserDetails implementation has getAuthorities())
+//        List<String> roles = userDetails.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.toList());
 
         return Jwts.builder()
-                .setSubject((userDetails.getUsername()))
+                .setSubject(userDetails.getUsername())
+                .claim("role", userDetails.getRole()) // Add roles to JWT payload
+                .claim("userId",  userDetails.getId()) // Add user ID if needed
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)

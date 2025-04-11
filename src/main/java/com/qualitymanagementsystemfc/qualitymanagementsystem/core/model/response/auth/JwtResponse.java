@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.auth;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
