@@ -8,15 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -28,18 +22,6 @@ public class JwtUtil {
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
-//    public String generateJwtToken(Authentication authentication) {
-//
-//        UserDetails userDetails =
-//                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        return Jwts.builder()
-//                .setSubject((userDetails.getUsername()))
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-//                .signWith(key(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
 
     public String generateJwtToken(Authentication authentication) {
 //        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -70,6 +52,16 @@ public class JwtUtil {
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public String getUserRoleFromJwtToken(String token) {
+        return Jwts.parser().setSigningKey(key()).build()
+                .parseClaimsJws(token).getBody().get("role", String.class);
+    }
+
+    public String getUserIdFromJwtToken(String token) {
+        return Jwts.parser().setSigningKey(key()).build()
+                .parseClaimsJws(token).getBody().get("userId", String.class);
     }
 
     public boolean validateJwtToken(String authToken) {

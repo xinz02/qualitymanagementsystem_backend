@@ -5,13 +5,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum UserRole {
 
-    STUDENT("Student", "Students"),
+    STUDENT("STUDENT", "Students"),
 
-    ACADEMIC_STAFF("Academic Staff", "Lecturers"),
+    ACADEMIC_STAFF("ACADEMIC_STAFF", "Lecturers"),
 
-    NON_ACADEMIC_STAFF("Non-Academic Staff", "Technicians"),
+    NON_ACADEMIC_STAFF("NON_ACADEMIC_STAFF", "Technicians"),
 
-    SPK_MANAGER("SPK Manager", "SPK Manager");
+    ADMIN("ADMIN", "Admin"),
+
+    SPK_MANAGER("SPK_MANAGER", "SPK Manager");
 
     private String code;
 

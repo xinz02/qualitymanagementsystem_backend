@@ -1,7 +1,7 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter;
 
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.User;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import org.springframework.stereotype.Component;
 
 @Component

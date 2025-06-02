@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

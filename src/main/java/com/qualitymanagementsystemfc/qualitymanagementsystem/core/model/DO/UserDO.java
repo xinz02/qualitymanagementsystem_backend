@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,22 +8,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-@Document(collection = "form")
+@Document(collection = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Form {
+public class UserDO {
 
     @Id
-    private String formID;
+    private String userId;
 
-    private String formName;
+    private String name;
 
-    private String viewPrivilege;
+    private String username;
 
-    private byte form;
+    private String password;
 
-    private String moduleID;
+    private String email;
+
+    private String role;
 
     private Date gmt_create;
 

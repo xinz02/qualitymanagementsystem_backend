@@ -23,7 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import static org.springframework.security.config.Customizer.withDefaults;
+
 import java.util.Arrays;
 
 @Configuration
@@ -77,6 +79,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/test/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/module/getAllModule").permitAll()
+                        .requestMatchers("/module/**").hasAnyAuthority("ADMIN", "SPK_MANAGER", "ACADEMIC_STAFF")
+                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/procedure/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
                         .anyRequest().authenticated());
 

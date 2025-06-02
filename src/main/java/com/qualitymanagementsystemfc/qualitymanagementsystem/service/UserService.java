@@ -1,8 +1,8 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.service;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.UserConverter;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.User;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,7 @@ public class UserService {
         userDO.setUsername(user.getUsername());
         userDO.setEmail(user.getEmail());
         userDO.setRole(user.getRole());
+        userDO.setGmt_modified(new Date());
 
         return userConverter.convertDOToModel(userRepository.save(userDO));
     }
@@ -70,7 +71,14 @@ public class UserService {
             return true;
         }
         return false;
+    }
 
+    public UserDO findByUserId(String userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User does not exists."));
+    }
+
+    public List<UserDO> findAllByUserId(List<String> userId) {
+        return userRepository.findAllById(userId);
     }
 
 }

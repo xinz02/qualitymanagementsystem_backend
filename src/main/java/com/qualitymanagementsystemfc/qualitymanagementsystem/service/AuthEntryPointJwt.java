@@ -15,7 +15,11 @@ import java.io.IOException;
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        request.isUserInRole("ADMIN");
+        request.getUserPrincipal();
+
         log.error("Unauthorized error: {}", authException.getMessage());
+//        log.error("Unauthorized role: {}", authException.);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
 }

@@ -1,6 +1,7 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.security;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.impl.UserDetailsServiceImpl;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
+
 
 public class JwtFilter extends OncePerRequestFilter {
     @Autowired
@@ -33,12 +36,52 @@ public class JwtFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("JWTFilter: " );
+
+                System.out.println("User: " + userDetails.getUsername());
+                System.out.println("Authorities: " + userDetails.getAuthorities());
+
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
         filterChain.doFilter(request, response);
     }
+
+
+
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+//            throws ServletException, IOException {
+//        try {
+//            String jwt = parseJwt(request);
+//            if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
+//                // Extract username and role directly from JWT
+//                String username = jwtUtil.getUserNameFromJwtToken(jwt);
+//                Claims claims = jwtUtil.getAllClaimsFromToken(jwt);
+//                String role = claims.get("role", String.class);
+//
+//                // Create authorities with proper ROLE_ prefix
+//                List<GrantedAuthority> authorities = Collections.singletonList(
+//                        new SimpleGrantedAuthority("ROLE_" + role)
+//                );
+//
+//                // Create authentication token with these authorities
+//                UsernamePasswordAuthenticationToken authentication =
+//                        new UsernamePasswordAuthenticationToken(
+//                                username,
+//                                null,
+//                                authorities);
+//
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                SecurityContextHolder.getContext().setAuthentication(authentication);
+//            }
+//        } catch (Exception e) {
+//            logger.error("Cannot set user authentication: {}", e);
+//        }
+//        filterChain.doFilter(request, response);
+//    }
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

@@ -1,17 +1,16 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.web;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.UserConverter;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.PasswordResetToken;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.User;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.LoginRequest;
-
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.PasswordResetToken;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.ForgotPasswordRequest;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.LoginRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.ResetPasswordRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.user.AddUserRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.user.DeleteUserRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.user.EditUserRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.auth.JwtResponse;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.UserRepository;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.security.JwtUtil;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.EmailService;
@@ -19,7 +18,6 @@ import com.qualitymanagementsystemfc.qualitymanagementsystem.service.PasswordRes
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.UserService;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.impl.UserDetailsImpl;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.utils.CommonApiResult;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +31,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -65,12 +62,26 @@ public class UserController {
     @Autowired
     private UserConverter userConverter;
 
+    /**
+     * Get List of Users
+     *
+     * @return allUsers
+     */
     @GetMapping("/getAllUsers")
-    public ResponseEntity<List<User>> getAllUsers() {
-        System.out.println("Called getalluser");
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<CommonApiResult<List<User>>> getAllUsers() {
+        CommonApiResult<List<User>> res = new CommonApiResult<>();
+        res.setData(userService.getAllUsers());
+        
+        return ResponseEntity.ok(res);
     }
 
+    /**
+     * Authenticates a user based on the provided login credentials.
+     *
+     * @param request containing username and password
+     * @return a ResponseEntity with JWT token and user info if successful,
+     *         or an error message with the appropriate HTTP status if authentication fails
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -82,9 +93,14 @@ public class UserController {
             String jwt = jwtUtil.generateJwtToken(authentication);
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
+            List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                     .toList();
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Authorities: " + auth.getAuthorities());
+            System.out.println("Is Authenticated: " + auth.isAuthenticated());
+            System.out.println("Roles: " + roles);
+
 
             JwtResponse res = new JwtResponse();
             res.setToken(jwt);
@@ -109,10 +125,10 @@ public class UserController {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         UserDO user = userService.getUserByEmail(request.getEmail());
 
-        if(user != null) {
+        if (user != null) {
             String token = passwordResetTokenService.createToken(user);
 
-            if(token == null) {
+            if (token == null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A password reset link has been sent before, please check your mailbox."));
             }
 
@@ -124,7 +140,7 @@ public class UserController {
 
     @PostMapping("/resetpassword")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        if(!passwordResetTokenService.isTokenValid(request.getToken())) {
+        if (!passwordResetTokenService.isTokenValid(request.getToken())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid or expired token. Please try again."));
         }
 
@@ -132,7 +148,7 @@ public class UserController {
 
         UserDO user = resetToken.getUser();
 
-        if(user != null) {
+        if (user != null) {
             userService.resetPassword(user, passwordEncoder.encode(request.getPassword()));
             passwordResetTokenService.deleteToken(resetToken.getId());
             return ResponseEntity.ok().body(Map.of("success", "Password Reset Successfully!"));
@@ -161,7 +177,7 @@ public class UserController {
 
         boolean success = userService.deleteUser(request.getUserId());
 
-        if(!success) {
+        if (!success) {
             res.setMessage("Unable to delete user. User not found");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
@@ -177,18 +193,23 @@ public class UserController {
 
         UserDO existedUser = userService.getUserByEmail(request.getUser().getEmail());
 
-        if(existedUser != null) {
+        if (existedUser != null) {
             res.setMessage("This email is registered. Unable to create again.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
 
         UserDO user = userService.addUser(request.getUser());
 
+        if (user == null) {
+            res.setMessage("Fail to add new user. Please try again later");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+        }
+
         res.setData(userConverter.convertDOToModel(user));
 
         String token = passwordResetTokenService.createToken(user);
 
-        if(token == null) {
+        if (token == null) {
             res.setMessage("A password reset link has been sent before, please check your mailbox.");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
         }
@@ -197,7 +218,7 @@ public class UserController {
 
         res.setMessage("Edited successfully!");
         return ResponseEntity.ok(res);
-    }
 
+    }
 
 }

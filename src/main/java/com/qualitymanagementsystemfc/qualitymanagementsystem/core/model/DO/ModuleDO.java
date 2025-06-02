@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,21 +10,21 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import java.util.Date;
 import java.util.List;
 
-@Document(collection = "category")
+@Document(collection = "module")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
+public class ModuleDO {
 
     @Id
-    private String categoryID;
+    private String moduleId;
 
-    private String categoryName;
+    private String moduleName;
 
-    private String moduleID;
+    private List<String> viewPrivilege;
 
-    @DocumentReference
-    private List<Procedure> procedureIDList;
+    @DocumentReference(lazy = true)
+    private List<CategoryDO> categories;
 
     private Date gmt_create;
 

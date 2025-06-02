@@ -1,7 +1,7 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.service;
 
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.PasswordResetToken;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.PasswordResetToken;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.PasswordResetTokenRepository;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

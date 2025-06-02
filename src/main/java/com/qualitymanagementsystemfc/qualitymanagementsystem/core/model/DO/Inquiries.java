@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.util.Date;
 public class Inquiries {
 
     @Id
-    private String inquiriesID;
+    private String inquiriesId;
 
     private String userName;
 

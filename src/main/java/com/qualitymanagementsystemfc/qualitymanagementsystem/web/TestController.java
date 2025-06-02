@@ -1,7 +1,7 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.web;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.enums.UserRole;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.LoginRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.utils.CommonApiResult;
 import org.springframework.web.bind.annotation.*;
