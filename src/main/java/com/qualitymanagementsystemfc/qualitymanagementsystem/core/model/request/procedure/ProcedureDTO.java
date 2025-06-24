@@ -1,5 +1,6 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.procedure;
 
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.procedure.PindaanDokumen;
 import lombok.Data;
 
 import java.util.List;
@@ -16,14 +17,16 @@ public class ProcedureDTO {
 
     private List<String> viewPrivilege;
 
-    private List<String> assignedToIds;
+//    private List<PindaanDokumen> pindaanDokumen;
+
+//    private List<String> assignedToIds;
 
 //    @DocumentReference(lazy = true)
 //    private ProcedureTemplateDO templateData;
 //
 //    private byte procedureFile;
 
-    private String approverId;
+//    private String approverId;
 
-    private String approveStatus;
+//    private String approveStatus;
 }

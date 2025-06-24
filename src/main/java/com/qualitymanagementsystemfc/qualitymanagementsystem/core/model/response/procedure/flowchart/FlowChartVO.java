@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class FlowChartVO {
+    private String flowChartId;
 
     private FlowChartData mainFlowChart;
 

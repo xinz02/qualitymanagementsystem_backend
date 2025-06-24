@@ -23,6 +23,4 @@ public class Node {
 
     private Map<String, String> data;
 
-
-
 }

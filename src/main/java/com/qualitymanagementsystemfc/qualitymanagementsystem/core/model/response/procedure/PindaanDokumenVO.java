@@ -1,4 +1,4 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.procedure;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.procedure.ProcedureTemplateDO;
@@ -10,14 +10,10 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.List;
 
-//@Document(collection = "pindaandokumen")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PindaanDokumen {
-
-//    @Id
-//    private String pindaanId;
+public class PindaanDokumenVO {
 
     private String versi;
 
@@ -27,24 +23,17 @@ public class PindaanDokumen {
 
     private String deskripsiPerubahan;
 
-    @DocumentReference(lazy = false)
-    private List<UserDO> disediakan;
+    private List<User> disediakan;
 
-    @DocumentReference(lazy = false)
-    private UserDO diluluskan;
+    private User diluluskan;
 
-    @DocumentReference(lazy = false)
-    private List<UserDO> assignTo;
+    private List<User> assignTo;
 
-    @DocumentReference(lazy = false)
-    private UserDO approver;
+    private User approver;
 
     private String approveStatus;
 
     private String description;
 
-    @DocumentReference(lazy = true)
-    private ProcedureTemplateDO procedureTemplateData;
-
-
+    private ProcedureTemplateVO procedureTemplateData;
 }

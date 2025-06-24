@@ -8,6 +8,8 @@ import java.util.List;
 @Data
 public class FlowChartDTO {
 
+    private String flowChartId;
+
     private FlowChartData mainFlowChart;
 
     private List<FlowChartData> subFlowCharts;

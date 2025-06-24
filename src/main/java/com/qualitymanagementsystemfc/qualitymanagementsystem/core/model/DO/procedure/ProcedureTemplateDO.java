@@ -26,7 +26,7 @@ public class ProcedureTemplateDO {
     private String nomborDokumen;
 
 //    @DocumentReference(lazy = true)
-    private List<PindaanDokumen> pindaanDokumenList;
+//    private List<PindaanDokumen> pindaanDokumenList;
 
     @DocumentReference(lazy = true)
     private FlowChartDO cartaFungsi;
@@ -52,4 +52,5 @@ public class ProcedureTemplateDO {
     private Date gmt_create;
 
     private Date gmt_modified;
+
 }

@@ -2,14 +2,12 @@ package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.respons
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.category.CategoryVO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.module.ModuleVO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ProcedureVO {
-
+public class ProcedureVersionVO {
     private String procedureId;
 
     private String procedureNumber;
@@ -22,13 +20,7 @@ public class ProcedureVO {
 
     private List<String> viewPrivilege;
 
-//    private List<User> assignTo;
-
-    private List<PindaanDokumenVO> pindaanDokumen;
-
-//    private ProcedureTemplateVO procedureTemplateData;
-
-    //    private byte procedureFile;
+    private PindaanDokumenVO pindaanDokumen;
 
     private String fileId;
 

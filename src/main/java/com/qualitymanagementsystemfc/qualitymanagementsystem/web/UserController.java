@@ -3,6 +3,7 @@ package com.qualitymanagementsystemfc.qualitymanagementsystem.web;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.UserConverter;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.PasswordResetToken;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.ForgotPasswordRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.LoginRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.auth.ResetPasswordRequest;
@@ -10,7 +11,6 @@ import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.user.DeleteUserRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.user.EditUserRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.auth.JwtResponse;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.UserRepository;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.security.JwtUtil;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.EmailService;
@@ -71,7 +71,7 @@ public class UserController {
     public ResponseEntity<CommonApiResult<List<User>>> getAllUsers() {
         CommonApiResult<List<User>> res = new CommonApiResult<>();
         res.setData(userService.getAllUsers());
-        
+
         return ResponseEntity.ok(res);
     }
 
@@ -80,7 +80,7 @@ public class UserController {
      *
      * @param request containing username and password
      * @return a ResponseEntity with JWT token and user info if successful,
-     *         or an error message with the appropriate HTTP status if authentication fails
+     * or an error message with the appropriate HTTP status if authentication fails
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -160,7 +160,6 @@ public class UserController {
 
     @PostMapping("/editUser")
     public ResponseEntity<CommonApiResult<User>> editUser(@RequestBody EditUserRequest request) {
-        System.out.println("Edit User");
         CommonApiResult<User> res = new CommonApiResult<>();
 
         User editedUser = userService.editUser(request.getUser());
@@ -172,7 +171,6 @@ public class UserController {
 
     @DeleteMapping("/deleteUser")
     public ResponseEntity<CommonApiResult<Void>> deleteUser(@RequestBody DeleteUserRequest request) {
-        System.out.println("Delete User");
         CommonApiResult<Void> res = new CommonApiResult<>();
 
         boolean success = userService.deleteUser(request.getUserId());
@@ -188,36 +186,46 @@ public class UserController {
 
     @PostMapping("/addUser")
     public ResponseEntity<CommonApiResult<User>> signup(@RequestBody AddUserRequest request) {
-        System.out.println("Add User");
+
         CommonApiResult<User> res = new CommonApiResult<>();
 
-        UserDO existedUser = userService.getUserByEmail(request.getUser().getEmail());
+        try {
+            boolean existedEmail = userService.existByEmail(request.getUser().getEmail()) || userService.existByUsername(request.getUser().getUsername());
+            boolean existedUsername = userService.existByEmail(request.getUser().getEmail()) || userService.existByUsername(request.getUser().getUsername());
 
-        if (existedUser != null) {
-            res.setMessage("This email is registered. Unable to create again.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-        }
+            if (existedEmail) {
+                res.setMessage("This email is registered. Unable to create again.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+            } else if (existedUsername) {
+                res.setMessage("This username is registered. Unable to create again.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+            }
 
-        UserDO user = userService.addUser(request.getUser());
+            UserDO user = userService.addUser(request.getUser());
 
-        if (user == null) {
-            res.setMessage("Fail to add new user. Please try again later");
+            if (user == null) {
+                res.setMessage("Fail to add new user. Please try again later");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+            }
+
+            res.setData(userConverter.convertDOToModel(user));
+
+            String token = passwordResetTokenService.createToken(user);
+
+            if (token == null) {
+                res.setMessage("A password reset link has been sent before, please check your mailbox.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
+            }
+
+            emailService.sendPasswordResetEmail(user.getEmail(), token, true);
+
+            res.setMessage("User added successfully!");
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            res.setMessage("Unexpected error occured. Please try again later");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
 
-        res.setData(userConverter.convertDOToModel(user));
-
-        String token = passwordResetTokenService.createToken(user);
-
-        if (token == null) {
-            res.setMessage("A password reset link has been sent before, please check your mailbox.");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
-        }
-
-        emailService.sendPasswordResetEmail(user.getEmail(), token, true);
-
-        res.setMessage("Edited successfully!");
-        return ResponseEntity.ok(res);
 
     }
 

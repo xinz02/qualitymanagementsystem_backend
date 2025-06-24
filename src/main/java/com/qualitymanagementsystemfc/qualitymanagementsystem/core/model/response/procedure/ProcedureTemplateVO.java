@@ -15,7 +15,7 @@ public class ProcedureTemplateVO {
     private String nomborDokumen;
 
     //    @DocumentReference(lazy = true)
-    private List<PindaanDokumen> pindaanDokumen;
+//    private List<PindaanDokumen> pindaanDokumen;
 
     @DocumentReference(lazy = true)
     private FlowChartVO cartaFungsi;
@@ -37,8 +37,4 @@ public class ProcedureTemplateVO {
     private String rekodDanSimpanan;
 
     private String lampiran;
-
-//    private Date gmt_create;
-//
-//    private Date gmt_modified;
 }

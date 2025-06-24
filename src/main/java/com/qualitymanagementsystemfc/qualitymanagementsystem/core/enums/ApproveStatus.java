@@ -3,19 +3,13 @@ package com.qualitymanagementsystemfc.qualitymanagementsystem.core.enums;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum UserRole {
+public enum ApproveStatus {
 
-    STUDENT("STUDENT", "Students"),
+    APPROVE("APPROVE", "Approved"),
 
-    ACADEMIC_STAFF("ACADEMIC_STAFF", "Lecturers"),
+    PENDING("PENDING", "Pending"),
 
-    NON_ACADEMIC_STAFF("NON_ACADEMIC_STAFF", "Technicians"),
-
-    ADMIN("ADMIN", "Admin"),
-
-    SPK_MANAGER("SPK_MANAGER", "SPK Manager"),
-
-    APPROVER("APPROVER", "Approver");
+    REJECT("REJECT", "Reject");
 
     private String code;
 
@@ -36,9 +30,4 @@ public enum UserRole {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    //    public UserRole getByCode(String code) {
-//
-//        return STUDENT;
-//    }
 }

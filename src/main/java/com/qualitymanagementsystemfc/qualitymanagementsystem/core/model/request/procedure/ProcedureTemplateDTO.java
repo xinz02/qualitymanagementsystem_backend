@@ -12,7 +12,7 @@ public class ProcedureTemplateDTO {
 
     private String nomborDokumen;
 
-    private List<PindaanDokumen> pindaanDokumen;
+//    private List<PindaanDokumen> pindaanDokumen;
 
     private FlowChartDTO cartaFungsi;
 

@@ -10,6 +10,7 @@ public class FlowChartConverter {
 
     public FlowChartDO convertDTOToDO(FlowChartDTO flowChartDTO) {
         FlowChartDO flowChartDO = new FlowChartDO();
+        flowChartDO.setFlowChartId(flowChartDTO.getFlowChartId());
         flowChartDO.setMainFlowChart(flowChartDTO.getMainFlowChart());
         flowChartDO.setSubFlowCharts(flowChartDTO.getSubFlowCharts());
 
@@ -18,6 +19,7 @@ public class FlowChartConverter {
 
     public FlowChartVO convertDOToVO(FlowChartDO flowChartDO) {
         FlowChartVO flowChartVO = new FlowChartVO();
+        flowChartVO.setFlowChartId(flowChartDO.getFlowChartId());
         flowChartVO.setMainFlowChart(flowChartDO.getMainFlowChart());
         flowChartVO.setSubFlowCharts(flowChartDO.getSubFlowCharts());
 
@@ -25,6 +27,7 @@ public class FlowChartConverter {
     }
 
     public FlowChartDO convertExistingDOFromDTO(FlowChartDO existingFlowChartDO, FlowChartDTO editFlowChartDTO) {
+        existingFlowChartDO.setFlowChartId(editFlowChartDTO.getFlowChartId());
         existingFlowChartDO.setMainFlowChart(editFlowChartDTO.getMainFlowChart());
         existingFlowChartDO.setSubFlowCharts(editFlowChartDTO.getSubFlowCharts());
 

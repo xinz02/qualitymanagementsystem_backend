@@ -16,7 +16,7 @@ public class ProcedureTemplateConverter {
         ProcedureTemplateDO procedureTemplateDO = new ProcedureTemplateDO();
         procedureTemplateDO.setNomborDokumen(procedureTemplateDTO.getNomborDokumen());
         procedureTemplateDO.setNamaDokumen(procedureTemplateDTO.getNamaDokumen());
-        procedureTemplateDO.setPindaanDokumenList(procedureTemplateDTO.getPindaanDokumen());
+//        procedureTemplateDO.setPindaanDokumenList(procedureTemplateDTO.getPindaanDokumen());
         procedureTemplateDO.setTujuan(procedureTemplateDTO.getTujuan());
         procedureTemplateDO.setObjektif(procedureTemplateDTO.getObjektif());
         procedureTemplateDO.setSkop(procedureTemplateDTO.getSkop());
@@ -34,8 +34,10 @@ public class ProcedureTemplateConverter {
         ProcedureTemplateVO procedureTemplateVO = new ProcedureTemplateVO();
         procedureTemplateVO.setNamaDokumen(procedureTemplateDO.getNamaDokumen());
         procedureTemplateVO.setNomborDokumen(procedureTemplateDO.getNomborDokumen());
-        procedureTemplateVO.setPindaanDokumen(procedureTemplateDO.getPindaanDokumenList());
-        procedureTemplateVO.setCartaFungsi(flowChartConverter.convertDOToVO(procedureTemplateDO.getCartaFungsi()));
+//        procedureTemplateVO.setPindaanDokumen(procedureTemplateDO.getPindaanDokumenList());
+        if(procedureTemplateDO.getCartaFungsi() != null) {
+            procedureTemplateVO.setCartaFungsi(flowChartConverter.convertDOToVO(procedureTemplateDO.getCartaFungsi()));
+        }
         procedureTemplateVO.setTujuan(procedureTemplateDO.getTujuan());
         procedureTemplateVO.setObjektif(procedureTemplateDO.getObjektif());
         procedureTemplateVO.setSkop(procedureTemplateDO.getSkop());
@@ -52,7 +54,7 @@ public class ProcedureTemplateConverter {
     public ProcedureTemplateDO convertExistingDOFromDTO(ProcedureTemplateDO existingProcedureTemplateDO, ProcedureTemplateDTO editProcedureTemplateDTO) {
         existingProcedureTemplateDO.setNamaDokumen(editProcedureTemplateDTO.getNamaDokumen());
         existingProcedureTemplateDO.setNomborDokumen(editProcedureTemplateDTO.getNomborDokumen());
-        existingProcedureTemplateDO.setPindaanDokumenList(editProcedureTemplateDTO.getPindaanDokumen());
+//        existingProcedureTemplateDO.setPindaanDokumenList(editProcedureTemplateDTO.getPindaanDokumen());
         existingProcedureTemplateDO.setTujuan(editProcedureTemplateDTO.getTujuan());
         existingProcedureTemplateDO.setObjektif(editProcedureTemplateDTO.getObjektif());
         existingProcedureTemplateDO.setSkop(editProcedureTemplateDTO.getSkop());

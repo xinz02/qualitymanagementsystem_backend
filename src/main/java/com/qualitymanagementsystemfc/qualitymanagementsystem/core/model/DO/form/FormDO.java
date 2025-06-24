@@ -1,10 +1,9 @@
-package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.procedure;
+package com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.form;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.CategoryDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.ModuleDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.procedure.PindaanDokumen;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.procedure.ProcedureDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,18 +14,18 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import java.util.Date;
 import java.util.List;
 
-@Document(collection = "procedure")
+@Document(collection = "form")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProcedureDO {
+public class FormDO {
 
     @Id
-    private String procedureId;
+    private String formId;
 
-    private String procedureNumber;
+    private String formNumber;
 
-    private String procedureName;
+    private String formName;
 
     @DocumentReference(lazy = false)
     private ModuleDO module;
@@ -36,25 +35,16 @@ public class ProcedureDO {
 
     private List<String> viewPrivilege;
 
-//    @DocumentReference(lazy = false)
-//    private List<UserDO> assignTo;
+    @DocumentReference(lazy = false)
+    private UserDO personInCharge;
 
-//    @DocumentReference(lazy = false)
-//    private ProcedureTemplateDO procedureTemplateData;
+    @DocumentReference(lazy = false)
+    private ProcedureDO relatedProcedure;
 
-//    private byte procedureFile;
     private String fileId;
-
-//    @DocumentReference(lazy = false)
-//    private UserDO approver;
-
-//    private String approveStatus;
-
-    private List<PindaanDokumen> pindaanDokumenList;
 
     private Date gmt_create;
 
     private Date gmt_modified;
-
 
 }

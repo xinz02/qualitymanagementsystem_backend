@@ -1,8 +1,8 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.service;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.UserConverter;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.UserDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.user.User;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +32,20 @@ public class UserService {
         return userRepository.findByUsername(name);
     }
 
+    public Optional<UserDO> getUserByName(String name) {
+        return userRepository.findByUsername(name);
+    }
+
     public UserDO getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public boolean existByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     public void resetPassword(UserDO user, String newPassword) {
