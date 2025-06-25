@@ -104,6 +104,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
+                "https://qms-fc-utm.vercel.app",
                 "https://view.officeapps.live.com",       // Microsoft Office Viewer
                 "https://*.officeapps.live.com",
                 "https://docs.google.com/"
