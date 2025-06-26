@@ -783,7 +783,7 @@ public class ProcedureService {
     }
 
     public boolean existsInCategory(String categoryId) {
-        ProcedureDO procedureDO = procedureRepository.exi;
+        return procedureRepository.existsByCategory(categoryId);
     }
 
 
