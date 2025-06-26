@@ -9,6 +9,7 @@ import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.category.NewCategoryRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.CategoryRepository;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.ModuleRepository;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.ProcedureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class CategoryService {
     private CategoryConverter categoryConverter;
 
     @Autowired
-    private ProcedureService procedureService;
+    private ProcedureRepository procedureRepository;
 
     public List<CategoryDO> getAllCategory() {
         return categoryRepository.findAll();
@@ -113,7 +114,7 @@ public class CategoryService {
                 throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
             }
 
-            boolean existsProceduresUnderCategory = procedureService.existsInCategory(d.getCategoryId());
+            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory(d.getCategoryId());
 
             if(existsProceduresUnderCategory) {
                 throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");

@@ -782,9 +782,9 @@ public class ProcedureService {
         return procedureConverter.convertDOToVO(updatedProcedure);
     }
 
-    public boolean existsInCategory(String categoryId) {
-        return procedureRepository.existsByCategory(categoryId);
-    }
+//    public boolean existsInCategory(String categoryId) {
+//        return procedureRepository.existsByCategory(categoryId);
+//    }
 
 
 }
