@@ -111,6 +111,7 @@ public class ModuleService {
 
     @Transactional
     public ModuleVO editModule(EditModuleRequest module) {
+
         ModuleDO existedModule = moduleRepository.findById(module.getModuleId()).orElseThrow(() -> new IllegalArgumentException("Module not exist."));
 
         existedModule.setModuleName(module.getModuleName());
@@ -142,6 +143,7 @@ public class ModuleService {
 
 
         return moduleConverter.convertDOToVO(existedModule);
+
     }
 
     @Transactional

@@ -19,4 +19,6 @@ public interface ProcedureRepository extends MongoRepository<ProcedureDO, String
 
 //    public List<ProcedureDO> findByApprover_UserId(String userId);
 
+    public boolean existsByCategory(String categoryId);
+
 }

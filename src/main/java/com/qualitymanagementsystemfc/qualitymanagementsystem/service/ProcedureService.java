@@ -207,8 +207,33 @@ public class ProcedureService {
 //            procedureListVO.setAssignedProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
 
         } else {
+//            List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByViewPrivilegeContaining(role));
+//            procedureDOs = procedureDOs.stream().filter(p -> {
+//                List<PindaanDokumen> approvedList = p.getPindaanDokumenList().stream()
+//                        .filter(pd -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(pd.getApproveStatus()))
+//                        .toList();
+//            }).toList();
+//            procedureListVO.setAccessibleProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
+
             List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByViewPrivilegeContaining(role));
-            procedureListVO.setAccessibleProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
+
+            procedureDOs = procedureDOs.stream()
+                    .map(p -> {
+                        List<PindaanDokumen> approvedList = p.getPindaanDokumenList().stream()
+                                .filter(pd -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(pd.getApproveStatus()))
+                                .toList();
+                        if (!approvedList.isEmpty()) {
+                            p.setPindaanDokumenList(approvedList); // keep only approved ones
+                            return p;
+                        }
+                        return null; // filter later
+                    })
+                    .filter(Objects::nonNull) // remove nulls (procedures with no approved PindaanDokumen)
+                    .toList();
+
+            procedureListVO.setAccessibleProcedures(
+                    procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList()
+            );
 
             if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
                 List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
@@ -755,6 +780,10 @@ public class ProcedureService {
         ProcedureDO updatedProcedure = procedureRepository.save(existingProcedure);
 
         return procedureConverter.convertDOToVO(updatedProcedure);
+    }
+
+    public boolean existsInCategory(String categoryId) {
+        ProcedureDO procedureDO = procedureRepository.exi;
     }
 
 

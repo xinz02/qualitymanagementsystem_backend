@@ -3,6 +3,7 @@ package com.qualitymanagementsystemfc.qualitymanagementsystem.service;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.CategoryConverter;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.CategoryDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.ModuleDO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.procedure.ProcedureDO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.category.DeleteCategoryRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.category.EditCategoryRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.category.NewCategoryRequest;
@@ -33,6 +34,9 @@ public class CategoryService {
 
     @Autowired
     private CategoryConverter categoryConverter;
+
+    @Autowired
+    private ProcedureService procedureService;
 
     public List<CategoryDO> getAllCategory() {
         return categoryRepository.findAll();
@@ -108,6 +112,13 @@ public class CategoryService {
             if (!categoryRepository.existsById(d.getCategoryId())) {
                 throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
             }
+
+            boolean existsProceduresUnderCategory = procedureService.existsInCategory(d.getCategoryId());
+
+            if(existsProceduresUnderCategory) {
+                throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
+            }
+
             categoryRepository.deleteById(d.getCategoryId());
             deletedIds.add(d.getCategoryId());
         }
