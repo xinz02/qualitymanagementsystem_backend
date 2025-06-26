@@ -219,6 +219,12 @@ public class ProcedureService {
 
             procedureDOs = procedureDOs.stream()
                     .map(p -> {
+                        List<PindaanDokumen> pindaanDokumenList = p.getPindaanDokumenList();
+
+                        if(pindaanDokumenList == null || pindaanDokumenList.isEmpty()) {
+                            return null;
+                        }
+
                         List<PindaanDokumen> approvedList = p.getPindaanDokumenList().stream()
                                 .filter(pd -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(pd.getApproveStatus()))
                                 .toList();
