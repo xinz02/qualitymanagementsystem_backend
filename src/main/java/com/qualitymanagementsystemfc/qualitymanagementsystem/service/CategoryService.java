@@ -114,7 +114,7 @@ public class CategoryService {
                 throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
             }
 
-            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory(d.getCategoryId());
+            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory_CategoryId(d.getCategoryId());
 
             if(existsProceduresUnderCategory) {
                 throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
