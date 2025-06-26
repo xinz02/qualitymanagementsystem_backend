@@ -153,7 +153,7 @@ public class ModuleController {
             res.setMessage("Module deleted successfully!");
             return ResponseEntity.ok(res);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             res.setMessage(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 

@@ -150,12 +150,26 @@ public class ModuleService {
     public boolean deleteModule(String moduleId) {
         ModuleDO moduleDO = moduleRepository.findById(moduleId).orElseThrow(() -> new IllegalArgumentException("Module does not exists."));
 
-        if(moduleDO.getCategories().isEmpty()) {
-            moduleRepository.deleteById(moduleId);
-            return true;
+        List<CategoryDO> categoryDOList = moduleDO.getCategories().stream().toList();
+
+        if(categoryDOList != null && !categoryDOList.isEmpty()) {
+            List<String> deleteCategoryIds = categoryService.deleteCategoryDOList(categoryDOList);
+
+            if(categoryDOList.size() != deleteCategoryIds.size()) {
+                throw new IllegalStateException("Fail to delete module. Categories are not completely deleted.");
+            }
         }
 
-        return false;
+        moduleRepository.deleteById(moduleId);
+
+        return true;
+
+//        if(moduleDO.getCategories().isEmpty()) {
+//            moduleRepository.deleteById(moduleId);
+//            return true;
+//        }
+
+//        return false;
     }
 
     public ModuleDO findByModuleId(String moduleId) {

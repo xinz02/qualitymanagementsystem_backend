@@ -132,5 +132,27 @@ public class CategoryService {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Category not exist."));
     }
 
+    @Transactional
+    public List<String> deleteCategoryDOList(List<CategoryDO> deleteCategoryList) {
+        List<String> deletedIds = new ArrayList<>();
+
+        for (CategoryDO d : deleteCategoryList) {
+            if (!categoryRepository.existsById(d.getCategoryId())) {
+                throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
+            }
+
+            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory_CategoryId(d.getCategoryId());
+
+            if(existsProceduresUnderCategory) {
+                throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
+            }
+
+            categoryRepository.deleteById(d.getCategoryId());
+            deletedIds.add(d.getCategoryId());
+        }
+
+        return deletedIds;
+    }
+
 
 }
