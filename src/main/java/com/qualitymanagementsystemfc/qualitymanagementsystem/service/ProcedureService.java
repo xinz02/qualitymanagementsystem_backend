@@ -222,6 +222,9 @@ public class ProcedureService {
                         List<PindaanDokumen> pindaanDokumenList = p.getPindaanDokumenList();
 
                         if(pindaanDokumenList == null || pindaanDokumenList.isEmpty()) {
+                            if(p.getFileId() != null && !p.getFileId().isBlank()) {
+                                return p;
+                            }
                             return null;
                         }
 
