@@ -1,10 +1,8 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.result.DeleteResult;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.EvidenceFileConverter;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.PindaanDokumenConverter;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.converter.ProcedureConverter;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.enums.ApproveStatus;
@@ -15,33 +13,26 @@ import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.DO.proce
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.models.procedure.PindaanDokumen;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.procedure.AddVersionRequest;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.procedure.ApproveProcedureDTO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.procedure.EvidenceFileDTO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.request.procedure.ProcedureDTO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure.*;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure.ProcedureListVO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure.ProcedureVO;
+import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure.ProcedureVersionVO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.repository.ProcedureRepository;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.security.JwtUtil;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProcedureService {
@@ -207,13 +198,7 @@ public class ProcedureService {
 //            procedureListVO.setAssignedProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
 
         } else {
-//            List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByViewPrivilegeContaining(role));
-//            procedureDOs = procedureDOs.stream().filter(p -> {
-//                List<PindaanDokumen> approvedList = p.getPindaanDokumenList().stream()
-//                        .filter(pd -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(pd.getApproveStatus()))
-//                        .toList();
-//            }).toList();
-//            procedureListVO.setAccessibleProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
+            ;
 
             List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByViewPrivilegeContaining(role));
 
@@ -221,8 +206,8 @@ public class ProcedureService {
                     .map(p -> {
                         List<PindaanDokumen> pindaanDokumenList = p.getPindaanDokumenList();
 
-                        if(pindaanDokumenList == null || pindaanDokumenList.isEmpty()) {
-                            if(p.getFileId() != null && !p.getFileId().isBlank()) {
+                        if (pindaanDokumenList == null || pindaanDokumenList.isEmpty()) {
+                            if (p.getFileId() != null && !p.getFileId().isBlank()) {
                                 return p;
                             }
                             return null;
@@ -244,25 +229,40 @@ public class ProcedureService {
                     procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList()
             );
 
+//            if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
+//                List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
+//
+//                procedureListVO.setAssignedProcedures(assignedProcedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
+//
+//            }
             if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
                 List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
-                procedureListVO.setAssignedProcedures(assignedProcedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
 
+
+                if (assignedProcedureDOs != null && !assignedProcedureDOs.isEmpty()) {
+                    assignedProcedureDOs = assignedProcedureDOs.stream().map(p -> {
+                                Optional<PindaanDokumen> latestAssigned = p.getPindaanDokumenList().stream()
+                                        .filter(pd -> pd.getAssignTo() != null &&
+                                                pd.getAssignTo().stream().anyMatch(u -> u.getUserId().equals(userId)))
+                                        .max(Comparator.comparingInt(pd -> Integer.parseInt(pd.getVersi())));
+
+                                if (latestAssigned.isPresent()) {
+                                    p.setPindaanDokumenList(List.of(latestAssigned.get()));
+                                    return p;
+                                } else {
+                                    return null; // No relevant version found for this procedure
+                                }
+                            })
+                            .filter(Objects::nonNull) // remove nulls (if no matching versions)
+                            .toList();
+                }
+
+                procedureListVO.setAssignedProcedures(
+                        assignedProcedureDOs.stream()
+                                .map(procedureConverter::convertDOToListInfo)
+                                .toList()
+                );
             }
-
-//            List<ProcedureDO> distinctProcedureDOs = procedureDOs.stream().collect(
-//                    Collectors.collectingAndThen(
-//                            Collectors.toMap(
-//                                    ProcedureDO::getProcedureId,
-//                                    p -> p,
-//                                    (p1, p2) -> p1 // Keep first
-//                            ),
-//                            map -> new ArrayList<>(map.values())
-//                    ));
-//
-//            return distinctProcedureDOs.stream()
-//                    .sorted(Comparator.comparing(ProcedureDO::getGmt_create))
-//                    .map(procedureConverter::convertDOToVO).toList();
         }
 
         return procedureListVO;
@@ -725,9 +725,6 @@ public class ProcedureService {
 
         return true;
     }
-
-
-
 
 
 //    public EvidenceFileListVO getEvidenceFile(String flowChartId, String nodeId) {
