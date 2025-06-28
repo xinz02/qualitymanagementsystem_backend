@@ -70,6 +70,9 @@ public class ProcedureService {
      */
     public ProcedureVO getProcedureById(String id, String role, String userId) {
         ProcedureDO procedureDO = procedureRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Procedure not exists."));
+//
+//        System.out.println("role: " + role);
+//        System.out.println("userId: " + userId);
 
         ProcedureVO procedureVO = null;
 
@@ -107,9 +110,21 @@ public class ProcedureService {
                     .max(Integer::compareTo)
                     .orElse(0);
 
+//            if (assignedVersions.isEmpty()) {
+//                // No assignment → show approved only
+//                procedureDO.setPindaanDokumenList(approvedList);
+
             if (assignedVersions.isEmpty()) {
-                // No assignment → show approved only
-                procedureDO.setPindaanDokumenList(approvedList);
+                // No assignment → show only the latest approved version (if exists)
+                Optional<PindaanDokumen> latestApproved = approvedList.stream()
+                        .max(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())));
+
+                if (latestApproved.isPresent()) {
+                    procedureDO.setPindaanDokumenList(List.of(latestApproved.get()));
+                } else {
+                    procedureDO.setPindaanDokumenList(Collections.emptyList());
+                }
+
             } else {
                 // Assigned user
                 if (maxApprovedVersion > maxAssignedVersion) {

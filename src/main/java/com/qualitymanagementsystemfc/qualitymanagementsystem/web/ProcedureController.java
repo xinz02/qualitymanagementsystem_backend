@@ -148,9 +148,6 @@ public class ProcedureController {
                 userId = jwtUtil.getUserIdFromJwtToken(token);
             }
 
-            System.out.println("role: " + role);
-            System.out.println("userId: " + userId);
-
 
             ProcedureListVO procedureListVO = procedureService.getAllProcedures(role, userId);
 
