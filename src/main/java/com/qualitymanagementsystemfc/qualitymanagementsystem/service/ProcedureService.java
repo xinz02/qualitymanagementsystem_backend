@@ -286,6 +286,7 @@ public class ProcedureService {
 //            }
             if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
                 List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
+                System.out.println("AssignedProcedures: " + assignedProcedureDOs);
 
 //                if (assignedProcedureDOs != null && !assignedProcedureDOs.isEmpty()) {
 //                    assignedProcedureDOs = assignedProcedureDOs.stream().map(p -> {
