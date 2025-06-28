@@ -110,12 +110,50 @@ public class ProcedureService {
                     .max(Integer::compareTo)
                     .orElse(0);
 
+//            // if not assigned to any version
 //            if (assignedVersions.isEmpty()) {
-//                // No assignment → show approved only
-//                procedureDO.setPindaanDokumenList(approvedList);
+//                // show only the latest approved version (if exists)
+//                Optional<PindaanDokumen> latestApproved = approvedList.stream()
+//                        .max(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())));
+//
+//                if (latestApproved.isPresent()) {
+//                    procedureDO.setPindaanDokumenList(List.of(latestApproved.get()));
+//                } else {
+//                    procedureDO.setPindaanDokumenList(Collections.emptyList());
+//                }
+//
+//            } else {
+//                // Assigned user
+//                if (maxApprovedVersion > maxAssignedVersion) {
+//                    // Latest approved is newer than assigned version → show approved only
+//                    procedureDO.setPindaanDokumenList(approvedList);
+//                } else {
+//                    // Assigned version is up-to-date → show all versions up to max assigned
+//                    List<PindaanDokumen> allVisible = pindaanList.stream()
+//                            .filter(p -> {
+//                                int versionNum = Integer.parseInt(p.getVersi());
+//                                return versionNum <= maxAssignedVersion;
+//                            })
+//                            .toList();
+//
+//                    // Deduplicate by versi
+//                    Map<String, PindaanDokumen> uniqueByVersi = new LinkedHashMap<>();
+//                    for (PindaanDokumen p : allVisible) {
+//                        uniqueByVersi.put(p.getVersi(), p); // last one wins
+//                    }
+//
+//                    // Sort by version number ascending
+//                    List<PindaanDokumen> sorted = uniqueByVersi.values().stream()
+//                            .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())))
+//                            .toList();
+//
+//                    procedureDO.setPindaanDokumenList(sorted);
+//                }
+//            }
 
-            if (assignedVersions.isEmpty()) {
-                // No assignment → show only the latest approved version (if exists)
+            // if not assigned to any version // assigned version is not latest
+            if (assignedVersions.isEmpty() || maxApprovedVersion > maxAssignedVersion) {
+                // show only the latest approved version (if exists)
                 Optional<PindaanDokumen> latestApproved = approvedList.stream()
                         .max(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())));
 
@@ -127,36 +165,33 @@ public class ProcedureService {
 
             } else {
                 // Assigned user
-                if (maxApprovedVersion > maxAssignedVersion) {
-                    // Latest approved is newer than assigned version → show approved only
-                    procedureDO.setPindaanDokumenList(approvedList);
-                } else {
-                    // Assigned version is up-to-date → show all versions up to max assigned
-                    List<PindaanDokumen> allVisible = pindaanList.stream()
-                            .filter(p -> {
-                                int versionNum = Integer.parseInt(p.getVersi());
-                                return versionNum <= maxAssignedVersion;
-                            })
-                            .toList();
+                // Assigned version is up-to-date → show all versions up to max assigned
+                List<PindaanDokumen> allVisible = pindaanList.stream()
+                        .filter(p -> {
+                            int versionNum = Integer.parseInt(p.getVersi());
+                            return versionNum <= maxAssignedVersion;
+                        })
+                        .toList();
 
-                    // Deduplicate by versi
-                    Map<String, PindaanDokumen> uniqueByVersi = new LinkedHashMap<>();
-                    for (PindaanDokumen p : allVisible) {
-                        uniqueByVersi.put(p.getVersi(), p); // last one wins
-                    }
-
-                    // Sort by version number ascending
-                    List<PindaanDokumen> sorted = uniqueByVersi.values().stream()
-                            .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())))
-                            .toList();
-
-                    procedureDO.setPindaanDokumenList(sorted);
+                // Deduplicate by versi
+                Map<String, PindaanDokumen> uniqueByVersi = new LinkedHashMap<>();
+                for (PindaanDokumen p : allVisible) {
+                    uniqueByVersi.put(p.getVersi(), p); // last one wins
                 }
+
+                // Sort by version number ascending
+                List<PindaanDokumen> sorted = uniqueByVersi.values().stream()
+                        .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())))
+                        .toList();
+
+                procedureDO.setPindaanDokumenList(sorted);
+
             }
 
             procedureVO = procedureConverter.convertDOToVO(procedureDO);
 
         } else {
+            // admin and spk manager - get all versions
             procedureVO = procedureConverter.convertDOToVO(procedureDO);
         }
 
