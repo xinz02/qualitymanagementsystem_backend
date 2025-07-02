@@ -1,26 +1,29 @@
-# Use Java 21 base image with Maven pre-installed
-FROM eclipse-temurin:21-jdk
+# ===============================
+# Build stage
+# ===============================
 
-# Set working directory
-WORKDIR /app
+FROM maven:3.8.3-openjdk-21 AS build
 
-# Copy Maven Wrapper files first (for better Docker layer caching)
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+WORKDIR /home/app
 
-RUN chmod +x mvnw
-
-# Pre-fetch dependencies
-RUN ./mvnw dependency:go-offline
-
-# Copy the entire source
+# Copy pom.xml and source code
+COPY pom.xml .
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build the JAR
+RUN mvn clean package
 
-# Expose the port your Spring Boot app runs on
-EXPOSE 8080
+# ===============================
+# Package stage
+# ===============================
 
-# Run the app
-CMD ["java", "-jar", "target/qualitymanagementsystem-0.0.1-SNAPSHOT.jar"]
+FROM openjdk:21-jdk-slim
+
+# Copy the built JAR from build stage
+COPY --from=build /home/app/target/qualitymanagementsystem-0.0.1-SNAPSHOT.jar /usr/local/lib/demo.jar
+
+# Expose port
+EXPOSE 8082
+
+# Run the JAR
+ENTRYPOINT ["java","-jar","/usr/local/lib/demo.jar"]
