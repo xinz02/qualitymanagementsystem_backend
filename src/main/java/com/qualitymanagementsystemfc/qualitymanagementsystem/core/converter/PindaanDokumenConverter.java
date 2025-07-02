@@ -10,6 +10,7 @@ import com.qualitymanagementsystemfc.qualitymanagementsystem.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -108,7 +109,9 @@ public class PindaanDokumenConverter {
         if (editDTO.getAssignedTo() != null && !editDTO.getAssignedTo().isEmpty()) {
             List<UserDO> assignedUsers = userService.findAllByUserId(editDTO.getAssignedTo());
             latestVersion.setAssignTo(assignedUsers);
-        } 
+        } else {
+            latestVersion.setAssignTo(new ArrayList<>());
+        }
 
         return latestVersion;
     }
