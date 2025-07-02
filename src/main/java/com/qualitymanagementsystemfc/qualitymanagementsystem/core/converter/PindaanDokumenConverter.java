@@ -109,8 +109,6 @@ public class PindaanDokumenConverter {
         if (editDTO.getAssignedTo() != null && !editDTO.getAssignedTo().isEmpty()) {
             List<UserDO> assignedUsers = userService.findAllByUserId(editDTO.getAssignedTo());
             latestVersion.setAssignTo(assignedUsers);
-        } else {
-            latestVersion.setAssignTo(new ArrayList<>());
         }
 
         return latestVersion;
