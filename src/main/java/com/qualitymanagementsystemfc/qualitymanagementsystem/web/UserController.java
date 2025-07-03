@@ -125,15 +125,18 @@ public class UserController {
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         UserDO user = userService.getUserByEmail(request.getEmail());
 
-        if (user != null) {
-            String token = passwordResetTokenService.createToken(user);
-
-            if (token == null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A password reset link has been sent before, please check your mailbox."));
-            }
-
-            emailService.sendPasswordResetEmail(user.getEmail(), token, false);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "This email is not registered. Please retype."));
         }
+
+        String token = passwordResetTokenService.createToken(user);
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "A password reset link has been sent before, please check your mailbox."));
+        }
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token, false);
+
 
         return ResponseEntity.ok().body(Map.of("message", "A password reset link has been sent, please check your mailbox."));
     }
@@ -161,6 +164,17 @@ public class UserController {
     @PostMapping("/editUser")
     public ResponseEntity<CommonApiResult<User>> editUser(@RequestBody EditUserRequest request) {
         CommonApiResult<User> res = new CommonApiResult<>();
+
+        boolean existedEmail = userService.existByEmail(request.getUser().getEmail());
+        boolean existedUsername = userService.existByUsername(request.getUser().getUsername());
+
+        if (existedEmail) {
+            res.setMessage("This email is registered. Unable to create again.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        } else if (existedUsername) {
+            res.setMessage("This username is registered. Unable to create again.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
 
         User editedUser = userService.editUser(request.getUser());
 
@@ -190,8 +204,8 @@ public class UserController {
         CommonApiResult<User> res = new CommonApiResult<>();
 
         try {
-            boolean existedEmail = userService.existByEmail(request.getUser().getEmail()) || userService.existByUsername(request.getUser().getUsername());
-            boolean existedUsername = userService.existByEmail(request.getUser().getEmail()) || userService.existByUsername(request.getUser().getUsername());
+            boolean existedEmail = userService.existByEmail(request.getUser().getEmail());
+            boolean existedUsername = userService.existByUsername(request.getUser().getUsername());
 
             if (existedEmail) {
                 res.setMessage("This email is registered. Unable to create again.");
