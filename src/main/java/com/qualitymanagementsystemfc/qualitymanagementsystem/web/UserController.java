@@ -165,17 +165,6 @@ public class UserController {
     public ResponseEntity<CommonApiResult<User>> editUser(@RequestBody EditUserRequest request) {
         CommonApiResult<User> res = new CommonApiResult<>();
 
-        boolean existedEmail = userService.existByEmail(request.getUser().getEmail());
-        boolean existedUsername = userService.existByUsername(request.getUser().getUsername());
-
-        if (existedEmail) {
-            res.setMessage("This email is registered. Unable to create again.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-        } else if (existedUsername) {
-            res.setMessage("This username is registered. Unable to create again.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-        }
-
         User editedUser = userService.editUser(request.getUser());
 
         res.setData(editedUser);
