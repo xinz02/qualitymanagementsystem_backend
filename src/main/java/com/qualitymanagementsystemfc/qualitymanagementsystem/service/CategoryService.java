@@ -89,41 +89,25 @@ public class CategoryService {
         categoryRepository.saveAll(savedCategoryDOList);
     }
 
-//    @Transactional
-//    public void deleteCategory(List<DeleteCategoryRequest> deleteCategoryList) {
-//
-//        List<String> ids = deleteCategoryList.stream()
-//                .map(DeleteCategoryRequest::getCategoryId)
-//                .toList();
-//
-//        List<CategoryDO> categories = categoryRepository.findAllById(ids);
-//
-//        if (categories.size() != ids.size()) {
-//            throw new IllegalArgumentException("Some categories do not exist in database.");
-//        }
-//
-//        categoryRepository.deleteAll(categories);
-//    }
+
+  private void validateCategoryDeletable(String categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new IllegalArgumentException("Category " + categoryId + " does not exist.");
+        }
+
+        if (procedureRepository.existsByCategory_CategoryId(categoryId)) {
+            throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
+        }
+    }
 
     @Transactional
     public List<String> deleteCategory(List<DeleteCategoryRequest> deleteCategoryList) {
         List<String> deletedIds = new ArrayList<>();
-
         for (DeleteCategoryRequest d : deleteCategoryList) {
-            if (!categoryRepository.existsById(d.getCategoryId())) {
-                throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
-            }
-
-            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory_CategoryId(d.getCategoryId());
-
-            if(existsProceduresUnderCategory) {
-                throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
-            }
-
+            validateCategoryDeletable(d.getCategoryId());
             categoryRepository.deleteById(d.getCategoryId());
             deletedIds.add(d.getCategoryId());
         }
-
         return deletedIds;
     }
 
@@ -135,24 +119,11 @@ public class CategoryService {
     @Transactional
     public List<String> deleteCategoryDOList(List<CategoryDO> deleteCategoryList) {
         List<String> deletedIds = new ArrayList<>();
-
         for (CategoryDO d : deleteCategoryList) {
-            if (!categoryRepository.existsById(d.getCategoryId())) {
-                throw new IllegalArgumentException("Category " + d.getCategoryId() + " does not exist.");
-            }
-
-            boolean existsProceduresUnderCategory = procedureRepository.existsByCategory_CategoryId(d.getCategoryId());
-
-            if(existsProceduresUnderCategory) {
-                throw new IllegalArgumentException("Unable to delete because exists procedure under selected category.");
-            }
-
+            validateCategoryDeletable(d.getCategoryId());
             categoryRepository.deleteById(d.getCategoryId());
             deletedIds.add(d.getCategoryId());
         }
-
         return deletedIds;
     }
-
-
 }
