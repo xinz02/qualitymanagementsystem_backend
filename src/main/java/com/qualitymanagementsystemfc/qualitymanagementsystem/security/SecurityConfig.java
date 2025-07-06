@@ -83,6 +83,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/test/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/module/getAllModule").permitAll()
                         .requestMatchers("/module/**").hasAnyAuthority("ADMIN", "SPK_MANAGER", "ACADEMIC_STAFF")
                         .requestMatchers("/category/**").permitAll()
