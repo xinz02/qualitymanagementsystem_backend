@@ -86,6 +86,13 @@ public class ProcedureController {
 
     }
 
+    /**
+     * Get procedure by id and version
+     * @param request
+     * @param id
+     * @param version
+     * @return
+     */
     @GetMapping("/getProcedure/{id}/{version}")
     public ResponseEntity<CommonApiResult<ProcedureVersionVO>> getProcedureByIdAndVersion(HttpServletRequest request, @PathVariable String id, @PathVariable String version) {
 
@@ -162,6 +169,11 @@ public class ProcedureController {
         }
     }
 
+    /**
+     * Get simplified procedure info - id and name - for react select
+     * @param request
+     * @return
+     */
     @GetMapping("/getProcedureInfo")
     public ResponseEntity<CommonApiResult<List<ProcedureInfo>>> getAllProceduresInfo(HttpServletRequest request) {
 

@@ -39,36 +39,6 @@ public class ModuleService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-//    public Module addModule(Module module) {
-//        Module existedModule = moduleRepository.findByModuleName(module.getModuleName());
-//
-//        if (existedModule != null) {
-//            throw new IllegalArgumentException("Module with the same name already exists.");
-//        }
-//
-//        module.setGmt_create(new Date());
-//        module.setGmt_modified(new Date());
-//        return moduleRepository.save(module);
-//    }
-
-//    public GetModuleResponse getAllModules(String role) {
-//        GetModuleResponse response = new GetModuleResponse();
-//
-//        List<Module> allModules = moduleRepository.findByViewPrivilegeContaining(role);
-//
-//        List<Category> allCategories = allModules.stream().flatMap(module -> categoryService.getAllCategoriesByModuleId(module.getModuleId()).stream()).toList();
-//
-//        Map<Module, List<Category>> moduleWithRespectiveCategories = new HashMap<>();
-//
-//        for(Module module : allModules) {
-//            moduleWithRespectiveCategories.computeIfAbsent(module, k -> allCategories.stream().filter(category -> category.getModuleId().equals(module.getModuleId())).toList());
-//        }
-//
-//        response.setModulesWithCategories(moduleWithRespectiveCategories);
-//
-//        return response;
-//    }
-
     public List<ModuleVO> getAllModules() {
         ModuleVO moduleVO = new ModuleVO();
 
@@ -102,7 +72,7 @@ public class ModuleService {
         if(module.getCategories() != null) {
             List<CategoryDO> savedCategoryDOList = categoryService.addNewCategory(module.getCategories(), savedModule.getModuleId());
             savedModule.setCategories(savedCategoryDOList);
-//            savedModule.getCategories().addAll(savedCategoryDOList);
+
             moduleRepository.save(savedModule);
         }
 
@@ -118,6 +88,7 @@ public class ModuleService {
         existedModule.setViewPrivilege(module.getViewPrivilege());
         existedModule.setGmt_modified(new Date());
 
+        // Add new categories
         if(module.getCategories() != null) {
             List<CategoryDO> savedCategoryDOList = categoryService.addNewCategory(module.getCategories(), module.getModuleId());
             if (existedModule.getCategories() == null) {
@@ -126,21 +97,22 @@ public class ModuleService {
             existedModule.getCategories().addAll(savedCategoryDOList);
         }
 
+        // Edit existing categories
         if(module.getCategoriesToEdit() != null) {
-//            List<CategoryDO> editedCategoryDOList = categoryService.editCategory(module.getCategoriesToEdit());
             categoryService.editCategory(module.getCategoriesToEdit());
         }
 
+        // Delete existing categories
         if (module.getCategoriesToDelete() != null) {
             List<String> deletedCategoryIds = categoryService.deleteCategory(module.getCategoriesToDelete());
 
+            // Remove category reference in module
             if (existedModule.getCategories() != null) {
                 existedModule.getCategories().removeIf(category -> deletedCategoryIds.contains(category.getCategoryId()));
             }
         }
 
         moduleRepository.save(existedModule);
-
 
         return moduleConverter.convertDOToVO(existedModule);
 
@@ -163,13 +135,6 @@ public class ModuleService {
         moduleRepository.deleteById(moduleId);
 
         return true;
-
-//        if(moduleDO.getCategories().isEmpty()) {
-//            moduleRepository.deleteById(moduleId);
-//            return true;
-//        }
-
-//        return false;
     }
 
     public ModuleDO findByModuleId(String moduleId) {

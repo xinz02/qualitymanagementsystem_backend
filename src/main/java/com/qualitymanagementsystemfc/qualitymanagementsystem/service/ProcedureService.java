@@ -70,20 +70,20 @@ public class ProcedureService {
      */
     public ProcedureVO getProcedureById(String id, String role, String userId) {
         ProcedureDO procedureDO = procedureRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Procedure not exists."));
-//
-//        System.out.println("role: " + role);
-//        System.out.println("userId: " + userId);
 
         ProcedureVO procedureVO = null;
 
+        // Student not allowed to view procedure
         if (role.equals(UserRole.STUDENT.getCode())) {
             throw new AccessDeniedException("Please login to view this procedure.");
         }
 
+        // If procedure has uploaded file, directly return
         if (procedureDO.getFileId() != null) {
             return procedureVO = procedureConverter.convertDOToVO(procedureDO);
         }
 
+        // Procedure has template, only return accessible versions
         List<PindaanDokumen> pindaanList = new ArrayList<>(procedureDO.getPindaanDokumenList());
 
         // Get approved versions
@@ -91,65 +91,27 @@ public class ProcedureService {
                 .filter(p -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(p.getApproveStatus()))
                 .toList();
 
+        // Get max approved version number
         int maxApprovedVersion = approvedList.stream()
                 .map(p -> Integer.parseInt(p.getVersi()))
                 .max(Integer::compareTo)
                 .orElse(0);
 
+        // If role is staff
         if (UserRole.ACADEMIC_STAFF.getCode().equals(role) ||
                 UserRole.NON_ACADEMIC_STAFF.getCode().equals(role)) {
 
-            // Check assigned versions
+            // Get assigned versions
             List<PindaanDokumen> assignedVersions = pindaanList.stream()
                     .filter(p -> p.getAssignTo() != null &&
                             p.getAssignTo().stream().anyMatch(u -> u.getUserId().equals(userId)))
                     .toList();
 
+            // Get largest assigned version
             int maxAssignedVersion = assignedVersions.stream()
                     .map(p -> Integer.parseInt(p.getVersi()))
                     .max(Integer::compareTo)
                     .orElse(0);
-
-//            // if not assigned to any version
-//            if (assignedVersions.isEmpty()) {
-//                // show only the latest approved version (if exists)
-//                Optional<PindaanDokumen> latestApproved = approvedList.stream()
-//                        .max(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())));
-//
-//                if (latestApproved.isPresent()) {
-//                    procedureDO.setPindaanDokumenList(List.of(latestApproved.get()));
-//                } else {
-//                    procedureDO.setPindaanDokumenList(Collections.emptyList());
-//                }
-//
-//            } else {
-//                // Assigned user
-//                if (maxApprovedVersion > maxAssignedVersion) {
-//                    // Latest approved is newer than assigned version → show approved only
-//                    procedureDO.setPindaanDokumenList(approvedList);
-//                } else {
-//                    // Assigned version is up-to-date → show all versions up to max assigned
-//                    List<PindaanDokumen> allVisible = pindaanList.stream()
-//                            .filter(p -> {
-//                                int versionNum = Integer.parseInt(p.getVersi());
-//                                return versionNum <= maxAssignedVersion;
-//                            })
-//                            .toList();
-//
-//                    // Deduplicate by versi
-//                    Map<String, PindaanDokumen> uniqueByVersi = new LinkedHashMap<>();
-//                    for (PindaanDokumen p : allVisible) {
-//                        uniqueByVersi.put(p.getVersi(), p); // last one wins
-//                    }
-//
-//                    // Sort by version number ascending
-//                    List<PindaanDokumen> sorted = uniqueByVersi.values().stream()
-//                            .sorted(Comparator.comparingInt(p -> Integer.parseInt(p.getVersi())))
-//                            .toList();
-//
-//                    procedureDO.setPindaanDokumenList(sorted);
-//                }
-//            }
 
             // if not assigned to any version // assigned version is not latest
             if (assignedVersions.isEmpty() || maxApprovedVersion > maxAssignedVersion) {
@@ -165,7 +127,7 @@ public class ProcedureService {
 
             } else {
                 // Assigned user
-                // Assigned version is up-to-date → show all versions up to max assigned
+                // Assigned version is latest, then show all versions
                 List<PindaanDokumen> allVisible = pindaanList.stream()
                         .filter(p -> {
                             int versionNum = Integer.parseInt(p.getVersi());
@@ -198,6 +160,15 @@ public class ProcedureService {
         return procedureVO;
     }
 
+    /**
+     * Get Procedure by id and version
+     *
+     * @param id
+     * @param role
+     * @param userId
+     * @param version
+     * @return
+     */
     public ProcedureVersionVO getProcedureByIdAndVersion(String id, String role, String userId, String version) {
         ProcedureDO procedureDO = procedureRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Procedure not exists."));
 
@@ -239,75 +210,65 @@ public class ProcedureService {
 
         ProcedureListVO procedureListVO = new ProcedureListVO();
 
+        // if role is admin or manager or approver, then return all procedures
         if (role.equals(UserRole.SPK_MANAGER.getCode()) || role.equals(UserRole.ADMIN.getCode()) || role.equals(UserRole.APPROVER.getCode())) {
             List<ProcedureDO> procedureDOs = procedureRepository.findAll();
             procedureListVO.setAccessibleProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
 
-//        } else if (role.equals(UserRole.APPROVER.getCode())) {
-//            List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByApprover_UserId(userId));
-//            procedureListVO.setAssignedProcedures(procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
-
         } else {
 
+            // if role is student or staff, then return all viewable procedure (with approve status only)
             List<ProcedureDO> procedureDOs = new ArrayList<>(procedureRepository.findByViewPrivilegeContaining(role));
 
+            // for every procedure
             procedureDOs = procedureDOs.stream()
                     .map(p -> {
+                        // get template versions
                         List<PindaanDokumen> pindaanDokumenList = p.getPindaanDokumenList();
 
+
                         if (pindaanDokumenList == null || pindaanDokumenList.isEmpty()) {
+                            // if has uploaded file, directly return
                             if (p.getFileId() != null && !p.getFileId().isBlank()) {
                                 return p;
                             }
+                            // else if no uploaded file and no version, return null
                             return null;
                         }
 
+                        // has template version, get approved versions
                         List<PindaanDokumen> approvedList = p.getPindaanDokumenList().stream()
                                 .filter(pd -> ApproveStatus.APPROVE.getCode().equalsIgnoreCase(pd.getApproveStatus()))
                                 .toList();
+
                         if (!approvedList.isEmpty()) {
                             p.setPindaanDokumenList(approvedList); // keep only approved ones
                             return p;
                         }
                         return null; // filter later
                     })
-                    .filter(Objects::nonNull) // remove nulls (procedures with no approved PindaanDokumen)
+                    .filter(Objects::nonNull) // remove nulls (procedures with no approved PindaanDokumen or no file)
                     .toList();
 
+            // set as accessible procedures
             procedureListVO.setAccessibleProcedures(
                     procedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList()
             );
 
-//            if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
-//                List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
-//
-//                procedureListVO.setAssignedProcedures(assignedProcedureDOs.stream().map(procedureConverter::convertDOToListInfo).toList());
-//
-//            }
+            // if not student (only staffs)
             if (!role.equals(UserRole.STUDENT.getCode()) && userId != null && !userId.isBlank()) {
-                List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
-                System.out.println("AssignedProcedures: " + assignedProcedureDOs);
 
-//                if (assignedProcedureDOs != null && !assignedProcedureDOs.isEmpty()) {
-//                    assignedProcedureDOs = assignedProcedureDOs.stream().map(p -> {
-//                                Optional<PindaanDokumen> latestAssigned = p.getPindaanDokumenList().stream()
-//                                        .filter(pd -> pd.getAssignTo() != null &&
-//                                                pd.getAssignTo().stream().anyMatch(u -> u.getUserId().equals(userId)))
-//                                        .max(Comparator.comparingInt(pd -> Integer.parseInt(pd.getVersi())));
-//
-//                                if (latestAssigned.isPresent()) {
-//                                    p.setPindaanDokumenList(List.of(latestAssigned.get()));
-//                                    return p;
-//                                } else {
-//                                    return null; // No relevant version found for this procedure
-//                                }
-//                            })
-//                            .filter(Objects::nonNull) // remove nulls (if no matching versions)
-//                            .toList();
-//                }
+                // check is there assigned procedures
+                List<ProcedureDO> assignedProcedureDOs = new ArrayList<>(procedureRepository.findByPindaanDokumenList_AssignToContaining(userService.findByUserId(userId)));
+
+                // if has assigned versions
                 if (assignedProcedureDOs != null && !assignedProcedureDOs.isEmpty()) {
+
+                    // all assigned procedures
                     assignedProcedureDOs = assignedProcedureDOs.stream()
                             .map(p -> {
+
+                                // get latest assigned versions
                                 Optional<PindaanDokumen> latestAssigned = p.getPindaanDokumenList().stream()
                                         .filter(pd -> pd.getAssignTo() != null &&
                                                 pd.getAssignTo().stream().anyMatch(u -> u.getUserId().equals(userId)))
@@ -315,20 +276,22 @@ public class ProcedureService {
 
                                 if (latestAssigned.isPresent()) {
                                     PindaanDokumen assignedVersion = latestAssigned.get();
-                                    // ⚠️ Skip if already approved
+                                    // if assigned procedure version approved, then no need to show in assigned
                                     if (ApproveStatus.APPROVE.getCode().equalsIgnoreCase(assignedVersion.getApproveStatus())) {
                                         return null;
                                     }
                                     p.setPindaanDokumenList(List.of(assignedVersion));
                                     return p;
                                 }
+
+                                // no latest assigned version
                                 return null;
                             })
                             .filter(Objects::nonNull)
                             .toList();
                 }
 
-
+                // set as assigned procedures
                 procedureListVO.setAssignedProcedures(
                         assignedProcedureDOs.stream()
                                 .map(procedureConverter::convertDOToListInfo)

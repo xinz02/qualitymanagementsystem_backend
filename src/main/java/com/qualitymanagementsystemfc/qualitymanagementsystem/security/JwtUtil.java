@@ -26,21 +26,12 @@ public class JwtUtil {
 
 
     public String generateJwtToken(Authentication authentication) {
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-//        UserDetails userDetails =
-//                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // Get roles (assuming your UserDetails implementation has getAuthorities())
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("role", userDetails.getRole()) // Add roles to JWT payload
-                .claim("userId",  userDetails.getId()) // Add user ID if needed
+                .claim("userId",  userDetails.getId()) // Add user ID to JWT payload
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)

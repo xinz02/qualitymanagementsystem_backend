@@ -56,40 +56,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     }
 
-
-
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-//            throws ServletException, IOException {
-//        try {
-//            String jwt = parseJwt(request);
-//            if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
-//                // Extract username and role directly from JWT
-//                String username = jwtUtil.getUserNameFromJwtToken(jwt);
-//                Claims claims = jwtUtil.getAllClaimsFromToken(jwt);
-//                String role = claims.get("role", String.class);
-//
-//                // Create authorities with proper ROLE_ prefix
-//                List<GrantedAuthority> authorities = Collections.singletonList(
-//                        new SimpleGrantedAuthority("ROLE_" + role)
-//                );
-//
-//                // Create authentication token with these authorities
-//                UsernamePasswordAuthenticationToken authentication =
-//                        new UsernamePasswordAuthenticationToken(
-//                                username,
-//                                null,
-//                                authorities);
-//
-//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//            }
-//        } catch (Exception e) {
-//            logger.error("Cannot set user authentication: {}", e);
-//        }
-//        filterChain.doFilter(request, response);
-//    }
-
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {

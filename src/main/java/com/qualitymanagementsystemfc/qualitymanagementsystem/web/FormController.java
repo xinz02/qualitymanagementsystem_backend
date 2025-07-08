@@ -1,7 +1,6 @@
 package com.qualitymanagementsystemfc.qualitymanagementsystem.web;
 
 import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.form.FormVO;
-import com.qualitymanagementsystemfc.qualitymanagementsystem.core.model.response.procedure.ProcedureVO;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.security.JwtUtil;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.service.FormService;
 import com.qualitymanagementsystemfc.qualitymanagementsystem.utils.CommonApiResult;
@@ -97,7 +96,7 @@ public class FormController {
             FormVO formVO = formService.addForm(formData, form);
 
             res.setData(formVO);
-            res.setMessage("Procedure added successfully!");
+            res.setMessage("Form added successfully!");
 
             return ResponseEntity.ok(res);
 
@@ -106,7 +105,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 
         } catch (Exception e) {
-            String message = !e.getMessage().isBlank() ? e.getMessage() :  "Fail to add new procedure. Please try again later.";
+            String message = !e.getMessage().isBlank() ? e.getMessage() :  "Fail to add new form. Please try again later.";
             res.setMessage(message);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }

@@ -53,18 +53,6 @@ public class ModuleController {
                 allModuleWithCategories =  moduleService.getAllModulesByRole(role);
             }
 
-//            if (role.isBlank()) {
-//                allModuleWithCategories = moduleService.getAllModulesByRole(UserRole.STUDENT.getCode());
-//            } else {
-//                allModuleWithCategories = role.equals(UserRole.ADMIN.getCode()) || role.equals(UserRole.SPK_MANAGER.getCode()) ? moduleService.getAllModules() : moduleService.getAllModulesByRole(role);
-//            }
-
-//            if(role.equals(UserRole.ADMIN.getCode()) || role.equals(UserRole.SPK_MANAGER.getCode())) {
-//                allModuleWithCategories = moduleService.getAllModules();
-//            } else {
-//                allModuleWithCategories = role.isBlank() ? moduleService.getAllModulesByRole(UserRole.STUDENT.getCode()) : moduleService.getAllModulesByRole(role);
-//            }
-
             res.setData(allModuleWithCategories);
 
             return ResponseEntity.ok(res);
@@ -84,7 +72,6 @@ public class ModuleController {
             res.setMessage("Request is null.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
-
 
         try {
             ModuleVO addedModule = moduleService.addModule(request);
@@ -106,7 +93,7 @@ public class ModuleController {
     }
 
     @PostMapping("/editModule")
-    public ResponseEntity<CommonApiResult<ModuleVO>> addNewModule(@RequestBody EditModuleRequest request) {
+    public ResponseEntity<CommonApiResult<ModuleVO>> editModule(@RequestBody EditModuleRequest request) {
         CommonApiResult<ModuleVO> res = new CommonApiResult<>();
 
         if (request == null) {

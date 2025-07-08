@@ -15,31 +15,22 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     private GrantedAuthority authority; // Single role
-//    private String roleWithoutPrefix;
 
-    public UserDetailsImpl(String id, String username, String password, GrantedAuthority authority
-//            , String roleWithoutPrefix
-            ) {
+    public UserDetailsImpl(String id, String username, String password, GrantedAuthority authority) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authority = authority;
-//        this.roleWithoutPrefix = roleWithoutPrefix;
     }
 
     public static UserDetailsImpl build(UserDO user) {
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
-//        GrantedAuthority authority = new SimpleGrantedAuthority(
-//                user.getRole().startsWith("ROLE_") ?
-//                        user.getRole() :
-//                        "ROLE_" + user.getRole()
-//        );
+
         return new UserDetailsImpl(
                 user.getUserId(),
                 user.getUsername(),
                 user.getPassword(),
                 authority
-//                user.getRole()
         );
     }
 
@@ -83,7 +74,6 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public String getRole() {
-//        return roleWithoutPrefix; //authority.getAuthority(); // Return role name
         return authority.getAuthority();
     }
 }

@@ -80,7 +80,7 @@ public class CategoryService {
     public void editCategory(List<EditCategoryRequest> editCategoryList) {
 
         List<CategoryDO> savedCategoryDOList = editCategoryList.stream().map(c -> {
-            CategoryDO categoryDO = categoryRepository.findById(c.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category " + c.getCategoryId() + " not found."));
+            CategoryDO categoryDO = categoryRepository.findById(c.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("Category " + c.getCategoryName() + " not found."));
             categoryDO.setGmt_modified(new Date());
             categoryDO.setCategoryName(c.getCategoryName());
             return categoryDO;
@@ -89,21 +89,6 @@ public class CategoryService {
         categoryRepository.saveAll(savedCategoryDOList);
     }
 
-//    @Transactional
-//    public void deleteCategory(List<DeleteCategoryRequest> deleteCategoryList) {
-//
-//        List<String> ids = deleteCategoryList.stream()
-//                .map(DeleteCategoryRequest::getCategoryId)
-//                .toList();
-//
-//        List<CategoryDO> categories = categoryRepository.findAllById(ids);
-//
-//        if (categories.size() != ids.size()) {
-//            throw new IllegalArgumentException("Some categories do not exist in database.");
-//        }
-//
-//        categoryRepository.deleteAll(categories);
-//    }
 
     @Transactional
     public List<String> deleteCategory(List<DeleteCategoryRequest> deleteCategoryList) {

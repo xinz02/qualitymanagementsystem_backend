@@ -32,19 +32,21 @@ public class PindaanDokumenConverter {
         pindaanDokumen.setButiran(pindaanDokumenDTO.getButiran());
         pindaanDokumen.setDeskripsiPerubahan(pindaanDokumenDTO.getDeskripsiPerubahan());
 
-        if (pindaanDokumenDTO.getDisediakan() != null && !pindaanDokumenDTO.getDisediakan().isEmpty()) {
-            List<UserDO> disediakanUsers = userService.findAllByUserId(pindaanDokumenDTO.getDisediakan());
-            pindaanDokumen.setDisediakan(disediakanUsers);
-        }
-
-        if (pindaanDokumenDTO.getDiluluskan() != null && !pindaanDokumenDTO.getDiluluskan().isEmpty()) {
-            UserDO diluluskanUser = userService.findByUserId(pindaanDokumenDTO.getDiluluskan());
-            pindaanDokumen.setDiluluskan(diluluskanUser);
-        }
+//        if (pindaanDokumenDTO.getDisediakan() != null && !pindaanDokumenDTO.getDisediakan().isEmpty()) {
+//            List<UserDO> disediakanUsers = userService.findAllByUserId(pindaanDokumenDTO.getDisediakan());
+//            pindaanDokumen.setDisediakan(disediakanUsers);
+//        }
+//
+//        if (pindaanDokumenDTO.getDiluluskan() != null && !pindaanDokumenDTO.getDiluluskan().isEmpty()) {
+//            UserDO diluluskanUser = userService.findByUserId(pindaanDokumenDTO.getDiluluskan());
+//            pindaanDokumen.setDiluluskan(diluluskanUser);
+//        }
 
         if (pindaanDokumenDTO.getAssignedTo() != null && !pindaanDokumenDTO.getAssignedTo().isEmpty()) {
             List<UserDO> assignedUsers = userService.findAllByUserId(pindaanDokumenDTO.getAssignedTo());
             pindaanDokumen.setAssignTo(assignedUsers);
+            pindaanDokumen.setDisediakan(assignedUsers);
+
         }
 
         return pindaanDokumen;
